@@ -1,0 +1,13 @@
+{
+    "name": "phone_gps_emulator",
+    "version": "0.0.1",
+    "description": "Emulating gps location",
+    "author": "Justin Goodman",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "express": "4.17.1"
+    }
+}

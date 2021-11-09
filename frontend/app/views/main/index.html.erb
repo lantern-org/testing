@@ -1,0 +1,50 @@
+<div class="container">
+    <h1 class="text-center">Testing Console</h1>
+    <div class="row">
+        <div class="col">
+            <h2>Server</h2>
+            <p>
+                info eventually
+            </p>
+            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#test" aria-expanded="false" aria-controls="test">
+                test
+            </button>
+            <div id="test" class="collapse">
+                i am visible now
+            </div>
+        </div>
+        <div class="col">
+            <h2>Phones</h2>
+            <div class="row">
+                <div class="col">
+                    <p>Status</p>
+                </div>
+                <div class="col">
+                    <p>Selected phones:</p>
+                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                        <button type="button" class="btn btn-outline-danger">Transmit</button>
+                        <button type="button" class="btn btn-outline-danger">Delete</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="add();">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div id="phones"></div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Port</th>
+                            <th scope="col">Health</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="phoneData">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
