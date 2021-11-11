@@ -58,6 +58,9 @@ class Phone < ApplicationRecord
   end
 
   def self.create_new
+    if Phone.where(status:'running').length >= 10 # global?
+      return nil
+    end
     cs = Phone.docker_phones.sort_by{ |c| c.info["Names"][0] }
     cs.each do |c|
       if c.info["State"] != "running"
