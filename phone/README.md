@@ -22,7 +22,7 @@ using `express.js`
 [GET]  /route
 <-
 -> gpx file route
-[POST] /route
+[PUT]  /route
 <- form file == gpx route
 -> success/error
 [DEL]  /route
