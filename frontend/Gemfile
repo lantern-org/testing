@@ -60,3 +60,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'docker-api', '~> 2.2'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
+gem 'view_component'

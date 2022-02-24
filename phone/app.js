@@ -22,6 +22,18 @@
 import express from 'express'
 const app = express()
 
+// "faye": "^1.4.0",
+// import faye from 'faye'
+// const bayeux = new faye.NodeAdapter({
+//   mount: '/faye',
+//   timeout: 45
+// });
+
+import expressWinston from 'express-winston';
+import winston from 'winston'; // for transports.Console
+
+import cors from 'cors'
+
 import bp from 'body-parser'
 const { json, urlencoded } = bp
 import multer from 'multer' // v1.0.5
@@ -56,22 +68,24 @@ let key = null // encryption key
 let udp_port = -1 // port to send udp packets
 let token = "" // token to signal server stop
 
-// middleware
-app.use(json()) // for parsing application/json
-app.use(urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-
+// routing
+const router = express.Router();
 // hi!
-app.get('/', (_, res) => {
+router.get('/', (_, res) => {
+  // bayeux.getClient().publish('/test', { text: 'Hello World!' });
   res.send('Hello World!')
 })
-
+// error!
+router.get('/error', function(_req,_res,next) {
+  // here we cause an error in the pipeline so we see express-winston in action.
+  return next(new Error("This is an error and it should be logged to the console"))
+})
 // return health
-app.get('/health', (_, res) => {
+router.get('/health', (_, res) => {
   res.json('healthy')
 })
-
 // return status info
-app.get('/status', (_, res) => {
+router.get('/status', (_, res) => {
   res.json({
     'id': id,
     'route': route,
@@ -83,15 +97,14 @@ app.get('/status', (_, res) => {
     'packets_sent': packetsSent,
   })
 })
-
 // return the stored route
-app.get('/route', (_, res) => {
+router.get('/route', (_, res) => {
   res.setHeader('Content-type', "application/octet-stream");
   res.setHeader('Content-disposition', `attachment; filename=route.gpx`);
   res.send(routeFile)
 })
 // save a given route
-app.put('/route', upload.single('route'), (req, res) => {
+router.put('/route', upload.single('route'), (req, res) => {
   try {
     if (!sending && req.file) {
       routeFile = String.fromCharCode(...req.file.buffer)
@@ -113,7 +126,7 @@ app.put('/route', upload.single('route'), (req, res) => {
   }
 })
 // delete the stored route
-app.delete('/route', (_, res) => {
+router.delete('/route', (_, res) => {
   if (!sending) {
     routeFile = null
     route = null
@@ -123,14 +136,13 @@ app.delete('/route', (_, res) => {
     res.json('fail')
   }
 })
-
 // return status of transmission
-app.get('/test', (_, res) => {
+router.get('/test', (_, res) => {
   // TODO
   res.json(sending)
 })
 // start/stop transmission
-app.post('/test', (req, res) => {
+router.post('/test', (req, res) => {
   console.log(req.body)
   if (req.body && 'transmit' in req.body) { // maybe requested stop
     if (req.body.transmit) {
@@ -163,8 +175,28 @@ app.post('/test', (req, res) => {
   }
 })
 
+// middleware
+app.use(cors()) // enables CORS for all requests
+app.use(json()) // for parsing application/json
+app.use(urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console()
+  ],
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.json()
+  )
+}))
+app.use(router)
+// app.use(express.errorLogger({
+//   dumpExceptions: true,
+//   showStack: true
+// }));
+// bayeux.attach(app);
+
 // start the server
-app.listen(port, () => {
+let server = app.listen(port, () => {
   console.log(`phone emulator ${id} listening at http://localhost:${port}`)
 })
 

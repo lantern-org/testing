@@ -8,10 +8,15 @@
 
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <%# <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %> %>
+    <%# <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
   </head>
 
+  <% if content_for?(:body_class) %>
+  <body class="<%= content_for(:body_class) %>" >
+    <button class="btn btn-primary position-relative float-end" onclick="toggleTheme();">Toggle</button>
+  <% else %>
   <body>
+  <% end %>
     <%= yield %>
   </body>
 </html>

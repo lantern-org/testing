@@ -1,5 +1,7 @@
-<div class="container">
+<% content_for :body_class do 'dark' end %>
+<div class="container-fluid">
     <h1 class="text-center">Testing Console</h1>
+    <br>
     <div class="row">
         <div class="col">
             <h2>Server</h2>
@@ -12,12 +14,12 @@
             <div class="row">
                 <div class="col">
                     <p>Status: <span id="status">Not Running</span></p>
+                    <p>Selected: <span id="num-selected">0</span></p>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-outline-primary" onclick="add();">Add Phone</button>
-
-                    <button type="button" class="btn btn-outline-info">Transmit Routes</button>
-
+                    <button type="button" class="btn btn-primary" onclick="add();">Add Phone</button>
+                    <button type="button" class="btn btn-success" id="start-all" onclick="startAll();">Start All</button>
+                    <button type="button" class="btn btn-danger" id="stop-all" onclick="stopAll();">Stop All</button>
                     <%# <div class="btn-group" role="group" aria-label="Actions">
                     </div> %>
                 </div>

@@ -1,6 +1,19 @@
 console.log('i was ran! hi');
 
+global.toggleTheme = function() {
+    const body = document.querySelector("body");
+    if (body.classList.contains("dark")) {
+        body.classList.remove("dark");
+    } else {
+        body.classList.add("dark");
+    }
+};
+
 let prev_data = null;
+
+function update_count() {
+    document.getElementById("num-selected").textContent = document.querySelectorAll("tr.table-active").length;
+}
 
 function update_table(data) {
     tbody = document.getElementById("phoneData");
@@ -27,73 +40,37 @@ function update_table(data) {
 
         tr.innerHTML =
 `
-    <td id="phone-${phone.port}" colspan="5">
-        <div>
-            ${phone.d_id}
+    <td id="phone-${phone.port}" class="collapse hide" colspan="5">
+        <div class="container">
+            <h6 class="text-center">${phone.d_id}</h6>
+            <div class="row">
+                <div class="col-4">
+                    <p>TODO -- map</p>
+                </div>
+                <div class="col-8">
+                    <span id="stats-${phone.port}">
+                        <pre><code>${JSON.stringify(phone, undefined, "  ")}</code></pre>
+                    </span>
+                    <hr>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="route-file-${phone.port}" onchange="upload(${phone.port});">
+                        <label class="input-group-text" for="route-file-${phone.port}">Upload</label>
+                    </div>
+                    <br>
+                    <button type="button" class="btn btn-success" id="start-${phone.port}" onclick="start(${phone.port});">Start</button>
+                    <button type="button" class="btn btn-danger" id="stop-${phone.port}" onclick="stop(${phone.port});">Stop</button>
+                    <button type="button" class="btn btn-warning" id="clear-${phone.port}" onclick="clear(${phone.port});">Clear route</button>
+                    <div class="spinner-grow spinner-grow-sm text-info d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </td>
 `;
         tbody.appendChild(tr);
-
-        // <% @phones.each do |phone| %>
-        // <tr class="table-active" onclick="select(this);">
-        //     <th scope="row"><%= phone.port - 3000 %></th>
-        //     <td><%= phone.port %></td>
-        //     <td><%= phone.health %></td>
-        //     <td><%= phone.status %></td>
-        //     <td>
-        //         <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#phone-<%= phone.port %>" aria-expanded="false" aria-controls="phone-<%= phone.port %>">
-        //             Actions
-        //         </button>
-        //     </td>
-        // </tr>
-        // <tr id="phone-<%= phone.port %>" class="collapse">
-        //     <td colspan="5">
-        //         <div>
-        //             <%= phone.d_id %>
-        //         </div>
-        //     </td>
-        // </tr>
-        // <% end %>
-
-        // let tr = document.createElement("tr");
-        // tr.classList.add("table-active");
-        // tr.onclick = select;
-        // let th = document.createElement("th");
-        // th.scope = "row";
-        // th.innerText = phone.port - 3000;
-        // tr.appendChild(th);
-        // let td = document.createElement("td");
-        // td.innerText = phone.port;
-        // tr.appendChild(td);
-        // td = document.createElement("td");
-        // td.innerText = phone.health;
-        // tr.appendChild(td);
-        // td = document.createElement("td");
-        // td.innerText = phone.status;
-        // tr.appendChild(td);
-        // td = document.createElement("td");
-        // let button = document.createElement("button");
-        // button.type = "button";
-        // button.classList.add("btn", "btn-secondary");
-        // button.setAttribute("data-bs-toggle", "collapse");
-        // button.setAttribute("data-bs-target", "#phone-"+phone.port);
-        // button.setAttribute("aria-expanded", false);
-        // button.setAttribute("aria-controls", "phone-"+phone.port);
-        // button.innerText = "Actions";
-        // td.appendChild(button);
-        // tr.appendChild(td);
-        // tbody.appendChild(tr);
-        // //
-        // tr = document.createElement("tr");
-        // tr.id = "phone-"+phone.port;
-        // tr.classList.add("collapse");
-        // td = document.createElement("td");
-        // td.colSpan = 5;
-        // td.innerText = phone.d_id;
-        // tr.appendChild(td);
-        // tbody.appendChild(tr);
     }
+    update_count();
 }
 
 global.sync = function(data) {
@@ -103,7 +80,7 @@ global.sync = function(data) {
         update_table(data);
     }
     prev_data = data;
-}
+};
 
 global.add = function() {
     fetch("/phone", {
@@ -112,17 +89,60 @@ global.add = function() {
     }).then(res => {
         console.log(res);
     });
-}
+};
+
+global.startAll = function() {
+    console.log("startAll");
+};
+
+global.stopAll = function() {
+    console.log("stopAll");
+};
+
+global.upload = function(port) {
+    console.log("upload", port);
+    let input = document.getElementById(`route-file-${port}`);
+    input.classList.remove("text-success", "text-danger");
+    let data = new FormData();
+    data.append('route', input.files[0]);
+    fetch(`http://localhost:${port}/route`,{
+        method: "PUT",
+        body: data
+    }).then(res => {
+        console.log(res);
+        if (res.ok) {
+            input.classList.add("text-success");
+        } else {
+            input.classList.add("text-danger");
+        }
+    }).catch(err => {
+        console.log(err);
+        input.classList.add("text-danger");
+    });
+};
+
+global.start = function(port) {
+    console.log(port);
+};
+
+global.stop = function(port) {
+    console.log(port);
+};
+
+global.clear = function(port) {
+    console.log(port);
+};
 
 global.select = function(e) {
-    const element = e.target.parentElement;
-    if (element.nodeName !== "TR") {
-        console.log(e);
-        return;
-    }
-    if (element.classList.contains("table-active")) {
-        element.classList.remove("table-active");
+    const element = e.target;
+    if (element.parentElement.nodeName === "TR") {
+        if (element.parentElement.classList.contains("table-active")) {
+            element.parentElement.classList.remove("table-active");
+        } else {
+            element.parentElement.classList.add("table-active");
+        }
+        update_count();
     } else {
-        element.classList.add("table-active");
+        console.log(e);
     }
-}
+};

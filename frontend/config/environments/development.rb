@@ -8,6 +8,10 @@ Rails.application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
+  # config.reload_classes_only_on_change = false
+  # config.serve_static_assets = false
+  config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
   # Do not eager load code on boot.
   config.eager_load = false
 

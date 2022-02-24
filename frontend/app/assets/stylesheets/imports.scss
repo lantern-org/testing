@@ -1,1 +1,66 @@
+// https://stackoverflow.com/a/68670276
+// https://stackoverflow.com/a/68429387
+
+// inspired by https://bootswatch.com/darkly/
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+.dark {
+
+    /* redefine theme colors for dark theme */
+    $primary: #375a7f;
+    $secondary: #444;
+    $success: #0e8164; // 00bc8c
+    $info: #136da8; // 3498db
+    $warning: #a75900; // f39c12
+    $danger: #d6311e; // e74c3c
+    $light: #616164; // adb5bd
+    $dark: #303030;
+    
+    $theme-colors: (
+        "primary": $primary,
+        "secondary": $secondary,
+        "success": $success,
+        "danger": $danger,
+        "info": $info, /* $indigo */
+        "warning": $warning,
+        "dark": $dark,
+        "light": $light,
+    );
+
+    /* redefine theme color variables */
+    @each $color, $value in $theme-colors {
+        --#{$variable-prefix}#{$color}: #{$value};
+    }
+
+    /* redefine theme color rgb vars (used for bg- colors) */
+    $theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
+    @each $color, $value in $theme-colors-rgb {
+        --#{$variable-prefix}#{$color}-rgb: #{$value};
+    }
+
+    $body-color: $gray-100;
+    $body-bg: $gray-900; // #222222;
+    --#{$variable-prefix}body-color: #{$body-color};
+    --#{$variable-prefix}body-bg: #{$body-bg};
+
+    $link-color: $success;
+    $link-hover-color: shift-color($link-color, $link-shade-percentage);
+    $link-decoration: none;
+    $btn-link-color: $link-color;
+    $btn-link-hover-color: $link-hover-color;
+
+    $table-border-color: $gray-700;
+
+    $table-color: $gray-100;
+    // $table-bg: $gray-800;
+    $table-active-bg: $gray-600; // #adb5bd;
+    $table-hover-color: $dark;
+    $table-hover-bg: $gray-600;
+
+    @import "bootstrap/scss/bootstrap";
+}
+
 @import "bootstrap/scss/bootstrap";

@@ -3,6 +3,9 @@ class PhoneController < ApplicationController
   # this is also a closed system, so security is not that important
   skip_before_action :verify_authenticity_token
 
+  # the ruby server is only used to interface with maintaining phone status
+  # the view page javascript handles actual testing infrastructure
+
   def index # GET /phone
     # return all phones
     render :json => Phone.all
@@ -34,7 +37,8 @@ class PhoneController < ApplicationController
     render :json => Phone.find(params[:id])
   end
 
-  def sync
+  def sync # GET /sync
+    # just for debugging
     Phone.sync
     render :json => {}
   end

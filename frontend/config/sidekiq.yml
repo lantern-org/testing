@@ -8,6 +8,6 @@
 
 :schedule:
   PhoneJob:
-    interval: '3s'
+    interval: '10s'
     queue: default
     enabled: true

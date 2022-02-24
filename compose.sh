@@ -15,7 +15,7 @@ docker network create --driver bridge $network
 # make ingest server
 # docker pull ghcr.io/lantern-org/ingest-server
 # you might have to change these UDP ports to whatever your system can use
-udp=60001-60030 # support a max of 100 active UDP connections (for now)
+udp=6000-6009 # support a max of 100 active UDP connections (for now)
 api=1025
 INGEST_URL=${pre}ingest-server
 # --expose  $api/tcp \
@@ -45,14 +45,14 @@ redis=${pre}redis
         --publish 6379:6379 \
         --name $redis \
         --detach \
-        redis redis-server
+        redis:6.2.6-alpine redis-server
 ) &
 REDIS_URL=redis://${redis}:6379
 
 # make sidekiq for frontend (same image container as frontend)
 # JOB_WORKER_URL ?
 frontend_tag=frontend
-docker build --quiet --tag $frontend_tag ./frontend
+# docker build --quiet --tag $frontend_tag ./frontend
 (
     sidekiq=$(MSYS_NO_PATHCONV=1 \
         docker container create \
@@ -76,23 +76,26 @@ docker build --quiet --tag $frontend_tag ./frontend
             --env     INGEST_URL=$INGEST_URL \
             --env     INGEST_PORT=$api \
             --publish 80:3000/tcp \
+            --publish 4035:4035 \
             --name    ${pre}frontend \
             --volume  "$PWD"/frontend:/app \
             --volume  //var/run/docker.sock:/var/run/docker.sock:rw \
             $frontend_tag) && \
     docker container start $frontend
 ) &
+# /bin/bash -c "bin/webpack-dev-server & bundle exec rails server -b 0.0.0.0"
 
 # make first phone emulator
 phone_tag=phone-emulator
 # --expose  $udp/udp \
 (
-    docker build --quiet --tag $phone_tag ./phone && \
+    # docker build --quiet --tag $phone_tag ./phone && \
     phone=$(MSYS_NO_PATHCONV=1 \
         docker container create \
             --network $network \
             --env     INGEST_URL=$INGEST_URL \
             --env     INGEST_PORT=$api \
+            --env     ID=0 \
             --publish 3000:3000 \
             --name    ${pre}phone-emulator_0 \
             $phone_tag) && \

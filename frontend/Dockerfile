@@ -1,4 +1,4 @@
-FROM ruby
+FROM ruby:3.0.2
 
 # SHELL ["/bin/bash", "-c"]
 RUN apt-get update -qq && \
@@ -10,6 +10,7 @@ WORKDIR /app
 COPY Gemfile /app/Gemfile
 COPY Gemfile.lock /app/Gemfile.lock
 COPY package.json /app/package.json
+# gem update --system
 RUN bundle install && npm install -g
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
