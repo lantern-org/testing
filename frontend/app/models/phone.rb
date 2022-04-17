@@ -77,7 +77,7 @@ class Phone < ApplicationRecord
       Thread.new {
         url = URI.parse("http://test_phone-emulator_#{c.port-3000}:#{c.port}/status") # make variable?
         req = Net::HTTP::Get.new(url.to_s)
-        res = Net::HTTP.start(url.host, url.port, :read_timeout => 1) {|http| # TODO -- FIX
+        res = Net::HTTP.start(url.host, url.port, :read_timeout => 2) {|http| # TODO -- FIX
           http.request(req) # blocking
         }
         data = JSON.parse(res.body)
@@ -96,17 +96,26 @@ class Phone < ApplicationRecord
     Docker::Container.create({
       'Image' => 'phone-emulator',
       'name' => "test_phone-emulator_#{port-3000}",
-      'Env' => ["INGEST_URL=#{ENV['INGEST_URL']}","INGEST_PORT=#{ENV['INGEST_PORT']}","ID=#{port-3000}"],
+      'Env' => [
+        "INGEST_URL=#{ENV['INGEST_URL']}",
+        "INGEST_PORT=#{ENV['INGEST_PORT']}",
+        "ID=#{port-3000}",
+        "PORT=#{port}"
+      ],
       'HostConfig' => {
         'PortBindings' => {
-          "3000/tcp" => [{'HostPort' => "#{port}"}]
-        }
-        # 0.0.0.0:3001 ?
+          "#{port}/tcp" => [
+            {
+              'HostIp' => "0.0.0.0",
+              'HostPort' => "#{port}"
+            }
+          ]
+        },
+        'NetworkMode' => "testing_default" # todo -- variable
+      },
+      'ExposedPorts' => {
+        "#{port}/tcp" => {}
       }
-      # },
-      # 'ExposedPorts' => {
-      #   "#{port}/tcp" => {}
-      # }
     })
   end
   def self.name_to_port(name)

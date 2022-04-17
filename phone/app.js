@@ -141,38 +141,34 @@ router.get('/test', (_, res) => {
   // TODO
   res.json(sending)
 })
-// start/stop transmission
+// start transmission
 router.post('/test', (req, res) => {
   console.log(req.body)
-  if (req.body && 'transmit' in req.body) { // maybe requested stop
-    if (req.body.transmit) {
-      // error for now
-      res.status(409)
-      res.json(false)
-    } else {
-      // (early) stop transmitting
-      sending = false
-      tid.clear() // quit sending
-      res.json(true)
-    }
-  } else if (req.body && ('freq' in req.body) && ('rand' in req.body) && ('i' in req.body || 'time' in req.body)) { // requested start
-    if (sending || !route) {
-      res.status(409)
-      res.json(false)
-    } else {
-      sending = true
-      execute(
-        parseInt(req.body.freq),
-        parseInt(req.body.rand),
-        parseInt(req.body.i),
-        parseInt(req.body.time)
-      )
-      res.json(true) // we attempted
-    }
+  if (sending || !route) { // validate start
+    res.status(409)
+    res.json(false)
+  } else if (req.body && ('freq' in req.body) && ('rand' in req.body) && ('i' in req.body || 'time' in req.body)) { // validate start
+    sending = true
+    execute(
+      parseInt(req.body.freq),
+      parseInt(req.body.rand),
+      parseInt(req.body.i),
+      parseInt(req.body.time)
+    )
+    res.json(true) // we attempted
   } else { // error
     res.status(400)
     res.json(false)
   }
+})
+// stop transmission
+router.delete('/test', (_, res) => {
+  if (sending) {
+    tid.clear()
+    signalServerStop()
+    sending = false
+  }
+  res.json(true)
 })
 
 // middleware
@@ -257,6 +253,11 @@ function sendPacket() {
   let [lon,lat] = getPoint() // increments idx
   let time = BigInt(Date.now())
   console.log(lat, lon, time)
+  log.push({
+    time: time,
+    latitude: lat,
+    longitude: lon
+  })
   // construct packet
   let buf = Buffer.alloc(32)
   buf.set(toIEEE754Single(lat), 0)
@@ -273,6 +274,7 @@ function sendPacket() {
   console.log(buf)
   client.send(buf, udp_port, ingestURL, (err) => {
     console.log('sent packet -- err='+err)
+    log[log.length-1].error = err
   })
   packetsSent += 1 // we sent a packet
   sending = idx < pts-1 // keep going if idx < len(route with interpolation)-1
@@ -313,17 +315,13 @@ function signalServerStop() {
           resolve(body)
         })
     })
-    req.on("error", (err) => {
-      reject(err)
-    })
+    req.on("error", reject)
     req.write(data)
     req.end()
   }).then(res => {
     console.log(res)
     log.push(res)
-  }).catch(err => {
-    console.log(err)
-  })
+  }).catch(console.log)
 }
 function execute(freq, rand, i, time) {
   // reset
@@ -371,9 +369,7 @@ function execute(freq, rand, i, time) {
           resolve(body)
         })
     })
-    req.on("error", (err) => {
-      reject(err)
-    })
+    req.on("error", reject)
     req.write(data)
     req.end()
   }).then(res => {
@@ -383,7 +379,5 @@ function execute(freq, rand, i, time) {
     udp_port = res.port
     token = res.token
     tid = setRandomInterval(freq-rand, freq+rand)
-  }).catch(err => {
-    console.log(err)
-  })
+  }).catch(console.log)
 }

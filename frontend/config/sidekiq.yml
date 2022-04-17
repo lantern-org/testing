@@ -1,13 +1,13 @@
 ---
 :verbose: false
 :concurrency: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-:timeout: 30
+:timeout: 3
 
 :queues:
   - default
 
 :schedule:
   PhoneJob:
-    interval: '10s'
+    interval: '4s'
     queue: default
     enabled: true

@@ -58,6 +58,8 @@ frontend_tag=frontend
         docker container create \
             --network $network \
             --env     REDIS_URL=$REDIS_URL \
+            --env     INGEST_URL=$INGEST_URL \
+            --env     INGEST_PORT=$api \
             --name    ${pre}sidekiq \
             --volume  "$PWD"/frontend:/app \
             --volume  //var/run/docker.sock:/var/run/docker.sock:rw \

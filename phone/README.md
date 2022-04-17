@@ -42,7 +42,7 @@ using `express.js`
 {
     "freq":int, // milliseconds between sending points
     "rand":int, // milli random factor: [freq-rand,freq+rand] == actual send rate
-    "i":int,    // interpolation factor
+    "i":   int, // interpolation factor
     "time":int  // total seconds to send points
 }
  * requires a route file to start
@@ -57,6 +57,10 @@ using `express.js`
  *   i = floor( (((time*1000)/freq)-n)/(n-1) )
  *   same deal with randomness returning a range for total_time
 -> success/error (and total computed sending time in seconds)
+[DEL]  /test
+<-
+-> success/error
+ * stops the running test, if any
 ```
 
 docker vars

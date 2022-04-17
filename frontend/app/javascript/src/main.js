@@ -23,6 +23,7 @@ function update_table(data) {
         let tr = document.createElement('tr');
         tr.classList.add("table-active");
         tr.onclick = select;
+        tr.setAttribute("data-port", phone.port);
         tr.innerHTML =
 `
     <th scope="row">${phone.port - 3000}</th>
@@ -86,13 +87,14 @@ global.add = function() {
     fetch("/phone", {
         method: "POST",
         body: JSON.stringify({})
-    }).then(res => {
-        console.log(res);
-    });
+    }).then(console.log);
 };
 
 global.startAll = function() {
     console.log("startAll");
+    document.querySelectorAll("tr.table-active").forEach(element => {
+       start(element.getAttribute("data-port"));
+    });
 };
 
 global.stopAll = function() {
@@ -105,7 +107,7 @@ global.upload = function(port) {
     input.classList.remove("text-success", "text-danger");
     let data = new FormData();
     data.append('route', input.files[0]);
-    fetch(`http://localhost:${port}/route`,{
+    fetch(`http://localhost:${port}/route`, {
         method: "PUT",
         body: data
     }).then(res => {
@@ -122,15 +124,29 @@ global.upload = function(port) {
 };
 
 global.start = function(port) {
-    console.log(port);
+    fetch(`http://localhost:${port}/test`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            freq: 500,
+            rand: 100,
+            i: 4
+        })
+    }).then(console.log).catch(console.log);
 };
 
 global.stop = function(port) {
-    console.log(port);
+    fetch(`http://localhost:${port}/test`, {
+        method:"DELETE"
+    }).then(console.log).catch(console.log);
 };
 
 global.clear = function(port) {
-    console.log(port);
+    fetch(`http://localhost:${port}/route`, {
+        method:"DELETE"
+    }).then(console.log).catch(console.log);
 };
 
 global.select = function(e) {
