@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
+yarn install
+
 # Start webpacker dev if in dev
-echo "hello there"
 if [ "$RAILS_ENV" == "development" ]; then
     ./bin/webpack-dev-server &
 fi

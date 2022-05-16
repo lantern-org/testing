@@ -9,7 +9,7 @@ global.toggleTheme = function() {
     }
 };
 
-let prev_data = null;
+let data = null;
 
 function update_count() {
     document.getElementById("num-selected").textContent = document.querySelectorAll("tr.table-active").length;
@@ -74,13 +74,13 @@ function update_table(data) {
     update_count();
 }
 
-global.sync = function(data) {
+global.sync = function(new_data) {
     // stupid way to test if there were any updates
-    if (JSON.stringify(prev_data) !== JSON.stringify(data)) {
-        console.log(data);
-        update_table(data);
+    if (JSON.stringify(data) !== JSON.stringify(new_data)) {
+        console.log(new_data);
+        update_table(new_data);
     }
-    prev_data = data;
+    data = new_data;
 };
 
 global.add = function() {
@@ -93,7 +93,7 @@ global.add = function() {
 global.startAll = function() {
     console.log("startAll");
     document.querySelectorAll("tr.table-active").forEach(element => {
-       start(element.getAttribute("data-port"));
+       global.start(element.getAttribute("data-port"));
     });
 };
 
@@ -124,6 +124,8 @@ global.upload = function(port) {
 };
 
 global.start = function(port) {
+    console.log(`starting phone_${port-3000}`);
+    // call phone to start sending
     fetch(`http://localhost:${port}/test`, {
         method: "POST",
         headers: {
@@ -134,13 +136,15 @@ global.start = function(port) {
             rand: 100,
             i: 4
         })
-    }).then(console.log).catch(console.log);
+    }).then(console.log).catch(console.log);;
 };
 
 global.stop = function(port) {
+    console.log(`stopping phone_${port-3000}`);
+    // call phone to stop sending
     fetch(`http://localhost:${port}/test`, {
-        method:"DELETE"
-    }).then(console.log).catch(console.log);
+        method: "DELETE"
+    }).then(console.log).catch(console.log);;
 };
 
 global.clear = function(port) {

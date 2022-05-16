@@ -1,6 +1,6 @@
 # phone emulator
 
-simple RESTful api (probably -- idk what REST actually means)
+simple RESTful api (probably)
 
 using `express.js`
 
@@ -57,10 +57,11 @@ using `express.js`
  *   i = floor( (((time*1000)/freq)-n)/(n-1) )
  *   same deal with randomness returning a range for total_time
 -> success/error (and total computed sending time in seconds)
-[DEL]  /test
+[DEL] /test
 <-
 -> success/error
- * stops the running test, if any
+ * stops the currently running test
+ * error if not currently testing
 ```
 
 docker vars

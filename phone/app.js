@@ -162,13 +162,15 @@ router.post('/test', (req, res) => {
   }
 })
 // stop transmission
-router.delete('/test', (_, res) => {
+router.delete('/test', (req, res) => {
   if (sending) {
     tid.clear()
     signalServerStop()
-    sending = false
+    res.json(true)
+  } else {
+    res.status(409)
+    res.json(false)
   }
-  res.json(true)
 })
 
 // middleware
@@ -353,21 +355,21 @@ function execute(freq, rand, i, time) {
         'Content-Length': data.length
       }
     }, res => {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          return reject(new Error('statusCode='+res.statusCode))
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return reject(new Error('statusCode='+res.statusCode))
+      }
+      let body = []
+      res.on('data', chunk => {
+        body.push(chunk)
+      })
+      res.on('end', () => {
+        try {
+          body = JSON.parse(Buffer.concat(body).toString())
+        } catch (e) {
+          reject(e)
         }
-        let body = []
-        res.on('data', chunk => {
-          body.push(chunk)
-        })
-        res.on('end', () => {
-          try {
-            body = JSON.parse(Buffer.concat(body).toString())
-          } catch (e) {
-            reject(e)
-          }
-          resolve(body)
-        })
+        resolve(body)
+      })
     })
     req.on("error", reject)
     req.write(data)
